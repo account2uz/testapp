@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'/>
+    <title>Earning Mini App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        :root {
+            --bg-color: #1a1a2e;
+            --card-color: #27273d;
+            --primary-accent: #00e6e6; /* Aqua */
+            --secondary-accent: #e94560; /* Red */
+            --text-color: #e0e0e0;
+            --light-text: #b3b3b3;
+            --icon-color: #6c757d;
+            --active-icon-color: var(--primary-accent);
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+        .app-container {
+            max-width: 450px;
+            margin: 0 auto;
+            background-color: var(--bg-color);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .header {
+            background: linear-gradient(135deg, #1f4068, #162447);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .header .profile-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .header .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 2.5, 0.2);
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+        .header .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .header .profile-pic i {
+            font-size: 24px;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+        .balance-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-top: 15px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+        }
+        #user-balance {
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--primary-accent);
+        }
+        .main-content {
+            flex: 1;
+            padding: 10px;
+            padding-bottom: 70px;
+            overflow-y: auto;
+        }
+        .section {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background-color: var(--card-color);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid #3d3d5c;
+        }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #3d3d5c;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-item h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+        .task-item .task-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 15px;
+            border-radius: 50%;
+        }
+        .task-button {
+            background: linear-gradient(45deg, var(--primary-accent), #00b8e6);
+            color: var(--bg-color);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .task-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 230, 230, 0.4);
+        }
+        .task-button.completed, .task-button:disabled {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+            cursor: not-allowed;
+        }
+        .button {
+            background: linear-gradient(45deg, var(--primary-accent), #00b8e6);
+            color: var(--bg-color);
+            padding: 14px 25px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            transition: transform 0.3s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 230, 230, 0.4);
+        }
+        .footer-nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--card-color);
+            padding: 15px 0;
+            border-top: 1px solid #3d3d5c;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 450px;
+        }
+        .footer-nav button {
+            background: none;
+            border: none;
+            color: var(--icon-color);
+            font-size: 11px;
+            cursor: pointer;
+            padding: 10px;
+            transition: color 0.3s, transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .footer-nav button.active {
+            color: var(--active-icon-color);
+            transform: scale(1.1);
+        }
+        .footer-nav button .fas {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .footer-nav button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 3px;
+            width: 0;
+            background-color: var(--active-icon-color);
+            border-bottom-left-radius: 2px;
+            border-bottom-right-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        .footer-nav button.active::after {
+            width: 100%;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #3d3d5c;
+            background-color: #1e1e35;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        label { color: var(--light-text); font-size: 0.9em; }
+        .form-group { margin-bottom: 20px; }
+        
+        .status-pending { color: #f39c12; font-weight: bold; }
+        .status-approved { color: #2ecc71; font-weight: bold; }
+        .status-rejected { color: #e94560; font-weight: bold; }
+        
+        .notification-banner {
+            background-color: #2e4a4a;
+            color: var(--primary-accent);
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            animation: slideInDown 0.5s ease-out;
+            display: none;
+        }
+        @keyframes slideInDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .ad-container {
+            background-color: var(--card-color);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        #ad-view-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 100;
+            display: none;
+        }
+        #ad-view-page #ad-timer {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--secondary-accent);
+            margin-bottom: 15px;
+        }
+        #ad-view-page #ad-content {
+            width: 100%;
+            height: 100%;
+            max-width: 400px;
+        }
+        .ad-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--card-color);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 101;
+            text-align: center;
+            display: none;
+        }
+        .header-title {
+            font-size: 2em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00e6e6, #00b8e6, #ff00ff, #00e6e6);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glowing-text 3s linear infinite;
+        }
+        @keyframes glowing-text {
+            to { background-position: 200% center; }
+        }
+        .header h1 {
+            font-size: 1.4em;
+            color: var(--text-color);
+        }
+        
+        .auth-page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: var(--bg-color);
+            padding: 20px;
+        }
+        .auth-box {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid #3d3d5c;
+        }
+        .auth-box h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--primary-accent);
+            margin-bottom: 20px;
+        }
+        .auth-box .button {
+            margin-top: 10px;
+        }
+        .auth-box a {
+            color: var(--primary-accent);
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        .auth-box a:hover {
+            text-decoration: underline;
+        }
+        .auth-error {
+            color: var(--secondary-accent);
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: none;
+        }
+        .support-message-box {
+            background-color: #2e3e50;
+            border-left: 5px solid var(--primary-accent);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .support-message-box p {
+            margin: 0;
+            line-height: 1.5;
+            color: var(--light-text);
+        }
+        .support-link-item .task-button {
+            width: auto;
+            min-width: 150px;
+            text-align: center;
+        }
+        .ad-message-box {
+            background: linear-gradient(135deg, #1f4068, #162447);
+            border: 1px solid var(--primary-accent);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 230, 230, 0.5);
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 10px rgba(0, 230, 230, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 230, 230, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(0, 230, 230, 0.5); }
+        }
+        .ad-message-box p {
+            color: var(--light-text);
+            font-size: 0.9em;
+            line-height: 1.4;
+            font-weight: bold;
+        }
+        .ad-task-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-color);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 1px solid #3d3d5c;
+            justify-content: space-between;
+            height: 60px;
+        }
+        .ad-task-icon-container {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ad-task-icon {
+            font-size: 24px;
+            color: #2ecc71;
+            filter: drop-shadow(0 0 5px rgba(46, 204, 113, 0.8));
+            animation: glowing-star 2s infinite alternate;
+        }
+        @keyframes glowing-star {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(46, 204, 113, 0.8)); }
+            100% { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(46, 204, 113, 1)); }
+        }
+        .ad-task-info {
+            flex-grow: 1;
+            margin-left: 15px;
+        }
+        .ad-task-info h4 {
+            margin: 0;
+            font-size: 1em;
+            color: var(--primary-accent);
+        }
+        .ad-task-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .ad-view-progress {
+            font-size: 0.8em;
+            color: var(--light-text);
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+        .ad-task-button {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(45deg, #00e6e6, #00b8e6);
+            color: var(--bg-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-size: 0.9em;
+        }
+        .ad-task-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 230, 230, 0.4);
+        }
+        .ad-task-button.completed {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+            cursor: not-allowed;
+        }
+        
+        #ad-view-page #ad-timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 102;
+        }
+
+        #ad-view-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 100;
+            display: none;
+        }
+
+        #ad-view-page #ad-content {
+            width: 100%;
+            height: 100%;
+            max-width: 450px;
+            max-height: 80vh;
+            position: relative;
+        }
+
+        .referral-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .referral-button {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .referral-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(41, 128, 185, 0.4);
+        }
+        
+        .referral-container {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .referral-username-text {
+            font-weight: 700;
+            color: var(--primary-accent);
+            font-size: 1.1em;
+        }
+        
+        .referral-task-button {
+            background: linear-gradient(45deg, var(--primary-accent), #00b8e6);
+            color: var(--bg-color);
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .referral-task-button.shared, .referral-task-button:disabled {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+            cursor: not-allowed;
+        }
+        
+        .referral-task-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 230, 230, 0.4);
+        }
+        
+        .referral-text {
+            font-weight: 600;
+            color: var(--primary-accent);
+            font-size: 1.1em;
+            background: linear-gradient(45deg, #00e6e6, #00b8e6, #ff00ff, #00e6e6);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glowing-text 3s linear infinite;
+        }
+
+        /* New Job Section Styles */
+        .job-card {
+            background-color: var(--card-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 1px solid #3d3d5c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .job-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 230, 230, 0.2);
+        }
+        .job-info h4 {
+            margin: 0;
+            font-size: 1.1em;
+            color: var(--primary-accent);
+        }
+        .job-info p {
+            margin: 5px 0 0 0;
+            font-size: 0.9em;
+            color: var(--light-text);
+        }
+        .job-reward {
+            font-weight: 700;
+            color: #2ecc71;
+            font-size: 1.2em;
+            white-space: nowrap;
+        }
+        .job-reward.completed {
+            color: var(--light-text);
+        }
+        .job-details-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .job-details-content {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            animation: slideInUp 0.5s ease-out;
+            position: relative;
+        }
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .job-details-content h3 {
+            margin-top: 0;
+            color: var(--primary-accent);
+        }
+        .job-details-content p {
+            color: var(--light-text);
+            line-height: 1.6;
+        }
+        .job-description-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px 0;
+        }
+        .job-proof-form {
+            background-color: var(--bg-color);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .job-submission-success {
+            color: var(--success-color);
+            font-weight: bold;
+            text-align: center;
+        }
+        .job-submission-rejected {
+            color: var(--secondary-accent);
+            font-weight: bold;
+            text-align: center;
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--light-text);
+            cursor: pointer;
+        }
+        .job-details-link-btn {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.9em;
+            text-decoration: none;
+        }
+        .job-details-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(41, 128, 185, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div id="login-page" class="auth-page">
+        <div class="auth-box">
+            <h2>User Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                <p id="login-error" class="auth-error"></p>
+                <button type="submit" class="button">Log In</button>
+            </form>
+            <a href="#" id="show-signup">Don't have an account? Sign Up</a>
+        </div>
+    </div>
+
+    <div id="signup-page" class="auth-page" style="display: none;">
+        <div class="auth-box">
+            <h2>User Sign Up</h2>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label>Telegram Username</label>
+                    <input type="text" id="signup-telegram-username" placeholder="e.g., @yourusername" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="signup-email" placeholder="Enter a valid email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a password" required>
+                </div>
+                <p id="signup-error" class="auth-error"></p>
+                <button type="submit" class="button">Sign Up</button>
+            </form>
+            <a href="#" id="show-login">Already have an account? Log In</a>
+        </div>
+    </div>
+    
+    <div class="app-container" id="main-app" style="display: none;">
+        <div class="header">
+            <h1 class="header-title">Welcome</h1>
+            <h1 style="color:white; font-size:1.4em; font-weight:700;">BDT Earning Pro Bot</h1>
+            <p>Your current balance</p>
+            <div class="balance-box">
+                <span id="user-balance">0</span> BDT
+            </div>
+            <div class="profile-container" style="display:none;">
+                <div class="profile-pic">
+                    <img id="user-profile-pic" src="" onerror="this.src='https://placehold.co/50x50/3d3d5c/e0e0e0?text=U';">
+                </div>
+                <div>
+                    <h1 id="user-name"></h1>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="notification-banner" class="notification-banner"></div>
+
+            <div id="home-section" class="section active">
+                <div class="card">
+                    <h3>Daily Tasks 📋</h3>
+                    <div id="daily-tasks-list"></div>
+                </div>
+            </div>
+            
+            <div id="earn-section" class="section">
+                <div class="ad-message-box">
+                    <p id="ad-info-message"></p>
+                </div>
+                <div class="card">
+                    <h3>Complete Tasks Below 💰</h3>
+                    <div id="monetag-ads-container">
+                        <p style="text-align:center; color:var(--light-text);">No ad tasks available yet.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="jobs-section" class="section">
+                <div class="card">
+                    <h3>Complete Jobs 💼</h3>
+                    <div id="jobs-list">
+                        <p style="text-align:center; color:var(--light-text);">No jobs available at the moment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="support-section" class="section">
+                <div class="card">
+                    <h3 style="text-align:center;">Support Center 🤝</h3>
+                    <div id="support-message-box" class="support-message-box">
+                        <p id="support-main-message">Please reach out to us using the links below for any queries.</p>
+                    </div>
+                    <div id="support-links-container" style="margin-top:20px;">
+                        </div>
+                </div>
+            </div>
+
+            <div id="withdraw-section" class="section">
+                <div class="card">
+                    <h3>Request a Withdrawal 💸</h3>
+                    <form id="withdraw-form">
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <select id="payment-method-select" required></select>
+                            <small id="withdraw-limit-info" style="color:var(--light-text); display:none;"></small>
+                        </div>
+                        <div class="form-group">
+                            <label>Account Holder's Name</label>
+                            <input type="text" id="user-account-name-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Account Number</label>
+                            <input type="text" id="user-account-number-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Withdrawal Amount</label>
+                            <input type="number" step="0.01" id="withdraw-amount-input" required>
+                            <small style="color:var(--light-text);">Minimum withdrawal: <span id="min-withdraw-amount">...</span> BDT</small>
+                        </div>
+                        <button type="submit" class="button">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-nav">
+            <button class="nav-button active" onclick="showSection('home')">
+                <i class="fas fa-home"></i>Home
+            </button>
+            <button class="nav-button" onclick="showSection('earn')">
+                <i class="fas fa-dollar-sign"></i>Earn
+            </button>
+            <button class="nav-button" onclick="showSection('jobs')">
+                <i class="fas fa-briefcase"></i>Jobs
+            </button>
+            <button class="nav-button" onclick="showSection('support')">
+                <i class="fas fa-headset"></i>Support
+            </button>
+            <button class="nav-button" onclick="showSection('withdraw')">
+                <i class="fas fa-wallet"></i>Withdraw
+            </button>
+            <button class="nav-button" onclick="logoutUser()">
+                <i class="fas fa-sign-out-alt"></i>Logout
+            </button>
+        </div>
+    </div>
+
+    <div id="ad-view-page">
+        <div id="ad-content">
+            <span id="ad-timer"></span>
+        </div>
+    </div>
+    
+    <div id="custom-popup" class="popup">
+        <p id="popup-message"></p>
+    </div>
+
+    <div id="job-details-popup" class="job-details-popup">
+        <div class="job-details-content">
+            <button class="close-btn" onclick="closeJobDetailsPopup()">&times;</button>
+            <h3 id="job-details-title"></h3>
+            <p style="margin-bottom: 5px;"><small>Reward: <span id="job-details-reward" style="color: #2ecc71; font-weight: bold;"></span></small></p>
+            <p style="margin-bottom: 5px;"><small>Type: <span id="job-details-type" style="color: var(--primary-accent);"></span></small></p>
+            <p style="margin-bottom: 15px;"><small>Expiry: <span id="job-details-expiry" style="color: var(--light-text);"></span></small></p>
+            <div id="job-details-description" class="job-description-content"></div>
+            <a id="job-details-link-btn" href="#" target="_blank" class="job-details-link-btn" style="margin-top: 15px; display: block; text-decoration: none; text-align: center;">Go to Job</a>
+            
+            <div id="job-proof-container" style="margin-top: 25px;">
+                <h4 style="margin-bottom: 10px; color: var(--light-text);">Submit Your Proof</h4>
+                <form id="job-submission-form" class="job-proof-form">
+                    <p id="job-proof-requirement" style="color:var(--primary-accent);"></p>
+                    <div id="proof-input-container" class="form-group"></div>
+                    <button type="submit" class="button" style="margin-top: 10px;">Submit Proof</button>
+                </form>
+                <div id="submission-status-message-container" style="text-align: center; margin-top: 15px;">
+                    <p id="job-submission-pending-message" class="job-submission-success">Proof submitted successfully! It will be reviewed by the admin.</p>
+                    <p id="job-submission-approved-message" class="job-submission-success" style="display: none;">This job is completed and approved! 🎉</p>
+                    <p id="job-submission-rejected-message" class="job-submission-rejected" style="display: none;">Your submission was rejected. Please try again or contact support.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyDa-_SNO5zDbgG1jmSXYgqsXdmGxpV2yaE",
+            authDomain: "bdt-earning-pro-bot.firebaseapp.com",
+            projectId: "bdt-earning-pro-bot",
+            storageBucket: "bdt-earning-pro-bot.firebasestorage.app",
+            messagingSenderId: "441528811084",
+            appId: "1:441528811084:web:967038e8491c57025fbee9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        let currentUserId = null;
+        let settingsData = {};
+        
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('signup-page').style.display = 'none';
+                document.getElementById('main-app').style.display = 'flex';
+                initializeApp();
+            } else {
+                currentUserId = null;
+                document.getElementById('main-app').style.display = 'none';
+                document.getElementById('login-page').style.display = 'flex';
+                document.getElementById('signup-page').style.display = 'none';
+            }
+        });
+
+        document.getElementById('show-signup').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('signup-page').style.display = 'flex';
+        });
+
+        document.getElementById('show-login').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('signup-page').style.display = 'none';
+            document.getElementById('login-page').style.display = 'flex';
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                document.getElementById('login-error').innerText = error.message;
+                document.getElementById('login-error').style.display = 'block';
+            }
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const telegramUsername = document.getElementById('signup-telegram-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const uid = userCredential.user.uid;
+                
+                await db.collection('users').doc(uid).set({
+                    name: name,
+                    telegramUsername: telegramUsername,
+                    email: email,
+                    balance: 0,
+                    referralCode: uid,
+                    referralCount: 0,
+                    referredBy: null,
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    tasksCompleted: {},
+                    adProgress: {},
+                    submissions: {} // Add submissions field for jobs
+                });
+                
+                displayPopup("Sign up successful! You can now log in.");
+                document.getElementById('signup-form').reset();
+                document.getElementById('signup-page').style.display = 'none';
+                document.getElementById('login-page').style.display = 'flex';
+                document.getElementById('signup-error').style.display = 'none';
+            } catch (error) {
+                document.getElementById('signup-error').innerText = error.message;
+                document.getElementById('signup-error').style.display = 'block';
+            }
+        });
+
+        function logoutUser() {
+            auth.signOut();
+            // The auth.onAuthStateChanged listener will handle the UI change
+        }
+
+        function initializeApp() {
+            loadUserData();
+            loadSettings();
+            loadNotifications();
+            loadJobs();
+        }
+
+        function loadUserData() {
+            db.collection('users').doc(currentUserId).onSnapshot(doc => {
+                if (doc.exists) {
+                    const user = doc.data();
+                    document.getElementById('user-name').innerText = user.name || 'User';
+                    document.getElementById('user-balance').innerText = parseFloat(user.balance || 0).toFixed(3);
+                }
+            });
+        }
+        
+        function loadSettings() {
+            db.collection('settings').doc('app_settings').onSnapshot(doc => {
+                if(doc.exists) {
+                    settingsData = doc.data();
+                    
+                    const dailyTasksContainer = document.getElementById('daily-tasks-list');
+                    dailyTasksContainer.innerHTML = '';
+                    if(settingsData.homeContent && settingsData.homeContent.tasks && settingsData.homeContent.tasks.length > 0) {
+                        const dailyResetIntervalHours = settingsData.homeContent.dailyTaskResetInterval || 0;
+                        settingsData.homeContent.tasks.forEach(task => {
+                            const taskItem = document.createElement('div');
+                            taskItem.classList.add('task-item');
+                            const iconHtml = task.iconUrl ? `<img src="${task.iconUrl}" alt="Task Icon" class="task-icon">` : '<i class="fas fa-check-circle" style="color:var(--primary-accent); margin-right: 15px;"></i>';
+                            
+                            const userDocRef = db.collection('users').doc(currentUserId);
+                            userDocRef.get().then(userDoc => {
+                                const userData = userDoc.data();
+                                const lastCompletedTime = userData.tasksCompleted[task.taskId]?.lastCompleted?.toDate();
+                                const timeSinceCompletion = lastCompletedTime ? (Date.now() - lastCompletedTime.getTime()) / (1000 * 60 * 60) : Infinity;
+                                const isReady = dailyResetIntervalHours === 0 || timeSinceCompletion >= dailyResetIntervalHours;
+                                
+                                const buttonText = isReady ? `${parseFloat(task.reward).toFixed(3)} BDT` : `Completed`;
+                                const buttonClass = isReady ? 'task-button' : 'task-button completed';
+                                const buttonAction = isReady ? `onclick="claimDailyTask(this, '${task.url}', '${task.taskId}', ${task.reward}, ${task.timer || 15})"` : `disabled`;
+
+                                taskItem.innerHTML = `
+                                    <h3>${iconHtml}${task.title}</h3>
+                                    <button id="daily-task-btn-${task.taskId}" class="${buttonClass}" ${buttonAction}>
+                                        ${buttonText}
+                                    </button>
+                                `;
+                                dailyTasksContainer.appendChild(taskItem);
+                            });
+                        });
+                    } else {
+                        dailyTasksContainer.innerHTML = `<p style="text-align:center; color:var(--light-text);">No tasks available yet.</p>`;
+                    }
+
+                    document.getElementById('ad-info-message').innerHTML = settingsData.earnContent?.adInfoMessage || 'No info message provided.';
+
+                    const adsContainer = document.getElementById('monetag-ads-container');
+                    adsContainer.innerHTML = '';
+                    if(settingsData.adTasks && settingsData.adTasks.length > 0) {
+                         const adResetIntervalHours = settingsData.adTaskResetInterval || 0;
+                         settingsData.adTasks.forEach(adTask => {
+                            const adCard = document.createElement('div');
+                            adCard.classList.add('task-item');
+                            
+                            const userDocRef = db.collection('users').doc(currentUserId);
+                            userDocRef.get().then(userDoc => {
+                                const userData = userDoc.data();
+                                const lastCompletedTime = userData.adProgress?.[adTask.adId]?.lastCompleted?.toDate();
+                                const timeSinceCompletion = lastCompletedTime ? (Date.now() - lastCompletedTime.getTime()) / (1000 * 60 * 60) : Infinity;
+                                const isReady = adResetIntervalHours === 0 || timeSinceCompletion >= adResetIntervalHours;
+
+                                const iconHtml = adTask.iconUrl ? `<img src="${adTask.iconUrl}" alt="Ad Icon" class="task-icon">` : '<i class="fas fa-play-circle" style="color:#f39c12; margin-right: 15px;"></i>';
+
+                                const buttonText = isReady ? `${parseFloat(adTask.reward).toFixed(3)} BDT` : `Completed`;
+                                const buttonClass = isReady ? 'task-button' : 'task-button completed';
+                                const buttonAction = isReady ? `onclick="startAdTask(this, '${adTask.adId}', '${adTask.adCode}', ${adTask.reward}, ${adTask.timer || 15})"` : `disabled`;
+
+                                adCard.innerHTML = `
+                                    <h3>${iconHtml}${adTask.adTitle}</h3>
+                                    <button id="ad-task-btn-${adTask.adId}" class="${buttonClass}" ${buttonAction}>
+                                        ${buttonText}
+                                    </button>
+                                `;
+                                adsContainer.appendChild(adCard);
+                            });
+                        });
+                    } else {
+                        adsContainer.innerHTML = `<p style="text-align:center; color:var(--light-text);">No ad tasks available yet.</p>`;
+                    }
+
+                    const paymentSelect = document.getElementById('payment-method-select');
+                    paymentSelect.innerHTML = '';
+                    if(settingsData.paymentMethods && settingsData.paymentMethods.length > 0) {
+                        settingsData.paymentMethods.forEach((method, index) => {
+                            const option = document.createElement('option');
+                            option.value = method.name;
+                            option.setAttribute('data-min-withdraw', method.minWithdraw);
+                            option.innerText = method.name;
+                            paymentSelect.appendChild(option);
+                        });
+                        paymentSelect.onchange = updateMinWithdrawalText;
+                        updateMinWithdrawalText();
+                    } else {
+                        paymentSelect.innerHTML = `<option value="">No methods available</option>`;
+                        document.getElementById('min-withdraw-amount').innerText = '0';
+                    }
+
+                    const supportMessageEl = document.getElementById('support-main-message');
+                    const supportLinksContainer = document.getElementById('support-links-container');
+                    
+                    if (settingsData.supportContent && settingsData.supportContent.message) {
+                        supportMessageEl.innerText = settingsData.supportContent.message;
+                    } else {
+                        supportMessageEl.innerText = 'Please reach out to us using the links below for any queries.';
+                    }
+
+                    supportLinksContainer.innerHTML = '';
+                    if (settingsData.supportContent && settingsData.supportContent.links && settingsData.supportContent.links.length > 0) {
+                        settingsData.supportContent.links.forEach(link => {
+                            const linkItem = document.createElement('div');
+                            linkItem.classList.add('task-item', 'support-link-item');
+                            const iconHtml = link.iconUrl ? `<img src="${link.iconUrl}" alt="Link Icon" class="task-icon">` : '<i class="fas fa-external-link-alt" style="color:var(--primary-accent); margin-right: 15px;"></i>';
+                            
+                            linkItem.innerHTML = `
+                                <h3>${iconHtml}${link.title}</h3>
+                                <a href="${link.url}" target="_blank" class="task-button">
+                                    <i class="fas fa-external-link-alt"></i> ${link.buttonText || 'Open Link'}
+                                </a>
+                            `;
+                            supportLinksContainer.appendChild(linkItem);
+                        });
+                    } else {
+                        supportLinksContainer.innerHTML = `<p style="text-align:center; color:var(--light-text);">No support links available.</p>`;
+                    }
+                }
+            });
+        }
+        
+        function updateMinWithdrawalText() {
+            const select = document.getElementById('payment-method-select');
+            const selectedOption = select.options[select.selectedIndex];
+            const minWithdraw = selectedOption ? selectedOption.getAttribute('data-min-withdraw') : '0';
+            document.getElementById('min-withdraw-amount').innerText = minWithdraw;
+        }
+
+        async function claimDailyTask(button, url, taskId, reward, timer) {
+            button.disabled = true;
+            
+            window.open(url, '_blank');
+
+            let countdown = timer;
+            button.innerText = `${countdown}s`;
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                button.innerText = `${countdown}s`;
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    completeDailyTask(taskId, reward);
+                    button.innerText = 'Completed';
+                    button.classList.add('completed');
+                }
+            }, 1000);
+        }
+
+        async function completeDailyTask(taskId, reward) {
+            const userDocRef = db.collection('users').doc(currentUserId);
+            
+            await userDocRef.update({
+                balance: firebase.firestore.FieldValue.increment(reward),
+                [`tasksCompleted.${taskId}`]: { lastCompleted: firebase.firestore.FieldValue.serverTimestamp() }
+            });
+            
+            displayPopup(`You have successfully earned ${parseFloat(reward).toFixed(3)} BDT!`);
+        }
+
+        async function startAdTask(button, adId, adUrl, reward, timer) {
+            button.disabled = true;
+            
+            window.open(adUrl, '_blank');
+
+            let countdown = timer;
+            button.innerText = `${countdown}s`;
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                button.innerText = `${countdown}s`;
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    completeAdTask(adId, reward);
+                    button.innerText = 'Completed';
+                    button.classList.add('completed');
+                }
+            }, 1000);
+        }
+
+        async function completeAdTask(adId, reward) {
+            const userDocRef = db.collection('users').doc(currentUserId);
+            
+            await userDocRef.update({
+                balance: firebase.firestore.FieldValue.increment(reward),
+                [`adProgress.${adId}`]: { lastCompleted: firebase.firestore.FieldValue.serverTimestamp() }
+            });
+            
+            displayPopup(`You have successfully earned ${parseFloat(reward).toFixed(3)} BDT!`);
+        }
+
+        function loadNotifications() {
+            const notificationBanner = document.getElementById('notification-banner');
+            db.collection('notifications').orderBy('timestamp', 'desc').limit(1).onSnapshot(snapshot => {
+                if (!snapshot.empty) {
+                    const notification = snapshot.docs[0].data();
+                    notificationBanner.innerText = notification.message;
+                    notificationBanner.style.display = 'block';
+                } else {
+                    notificationBanner.style.display = 'none';
+                }
+            });
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId + '-section').classList.add('active');
+            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.nav-button[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+        
+        function displayPopup(message) {
+            const popup = document.getElementById('custom-popup');
+            document.getElementById('popup-message').innerText = message;
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 3000);
+        }
+
+        document.getElementById('withdraw-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedOption = document.getElementById('payment-method-select').options[document.getElementById('payment-method-select').selectedIndex];
+            const minWithdraw = parseFloat(selectedOption.getAttribute('data-min-withdraw')) || 0;
+            const withdrawAmount = parseFloat(document.getElementById('withdraw-amount-input').value);
+            const userDocRef = db.collection('users').doc(currentUserId);
+            const userDoc = await userDocRef.get();
+            const userBalance = userDoc.exists ? userDoc.data().balance || 0 : 0;
+            
+            if (withdrawAmount < minWithdraw) {
+                displayPopup(`Withdrawal amount must be at least ${minWithdraw} BDT.`);
+                return;
+            }
+            if (withdrawAmount > userBalance) {
+                displayPopup('Insufficient balance.');
+                return;
+            }
+
+            const withdrawData = {
+                userId: currentUserId,
+                method: document.getElementById('payment-method-select').value,
+                accountName: document.getElementById('user-account-name-input').value,
+                accountNumber: document.getElementById('user-account-number-input').value,
+                amount: withdrawAmount,
+                status: 'Pending',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            await db.collection('withdrawals').add(withdrawData);
+            
+            await userDocRef.update({
+                balance: firebase.firestore.FieldValue.increment(-withdrawAmount)
+            });
+            
+            displayPopup('Withdrawal request submitted successfully. Payment will be processed within 72 hours.');
+            document.getElementById('withdraw-form').reset();
+        });
+
+        // NEW JOB SECTION FUNCTIONS
+        function loadJobs() {
+            const jobsListContainer = document.getElementById('jobs-list');
+            jobsListContainer.innerHTML = '';
+            
+            db.collection('jobs')
+              .where('status', '==', 'Active')
+              .onSnapshot(async (snapshot) => {
+                jobsListContainer.innerHTML = '';
+                if (snapshot.empty) {
+                    jobsListContainer.innerHTML = `<p style="text-align:center; color:var(--light-text);">No jobs available at the moment.</p>`;
+                    return;
+                }
+                
+                const userDoc = await db.collection('users').doc(currentUserId).get();
+                const userSubmissions = userDoc.data().submissions || {};
+                
+                snapshot.forEach(doc => {
+                    const job = doc.data();
+                    const jobId = doc.id;
+                    const submissionStatus = userSubmissions[jobId]?.status || 'Available';
+                    
+                    const card = document.createElement('div');
+                    card.classList.add('job-card');
+                    card.setAttribute('data-job-id', jobId);
+                    card.onclick = () => showJobDetails(jobId, job, submissionStatus);
+                    
+                    let statusText = '';
+                    let statusClass = '';
+                    if (submissionStatus === 'Approved') {
+                        statusText = 'Completed';
+                        statusClass = 'status-approved';
+                    } else if (submissionStatus === 'Pending') {
+                        statusText = 'Pending';
+                        statusClass = 'status-pending';
+                    } else if (submissionStatus === 'Rejected') {
+                        statusText = 'Rejected';
+                        statusClass = 'status-rejected';
+                    } else {
+                        statusText = `৳${job.reward}`;
+                        statusClass = 'job-reward';
+                    }
+
+                    card.innerHTML = `
+                        <div class="job-info">
+                            <h4>${job.title}</h4>
+                            <p>${job.type}</p>
+                        </div>
+                        <div class="job-reward ${statusClass}">
+                            ${statusText}
+                        </div>
+                    `;
+                    jobsListContainer.appendChild(card);
+                });
+            });
+        }
+        
+        async function showJobDetails(jobId, job, submissionStatus) {
+            const jobDetailsPopup = document.getElementById('job-details-popup');
+            
+            document.getElementById('job-details-title').innerText = job.title;
+            document.getElementById('job-details-reward').innerText = `৳${job.reward}`;
+            document.getElementById('job-details-type').innerText = job.type;
+            const expiryDate = job.expiry ? job.expiry.toDate().toLocaleString() : 'N/A';
+            document.getElementById('job-details-expiry').innerText = expiryDate;
+            document.getElementById('job-details-description').innerHTML = job.description;
+            
+            const linkBtn = document.getElementById('job-details-link-btn');
+            if (job.jobLink) {
+                linkBtn.href = job.jobLink;
+                linkBtn.style.display = 'block';
+            } else {
+                linkBtn.style.display = 'none';
+            }
+            
+            const proofContainer = document.getElementById('job-proof-container');
+            
+            const jobSubmissionForm = document.getElementById('job-submission-form');
+            const pendingMessage = document.getElementById('job-submission-pending-message');
+            const approvedMessage = document.getElementById('job-submission-approved-message');
+            const rejectedMessage = document.getElementById('job-submission-rejected-message');
+
+            jobSubmissionForm.style.display = 'block';
+            pendingMessage.style.display = 'none';
+            approvedMessage.style.display = 'none';
+            rejectedMessage.style.display = 'none';
+
+            if (submissionStatus === 'Pending') {
+                jobSubmissionForm.style.display = 'none';
+                pendingMessage.style.display = 'block';
+            } else if (submissionStatus === 'Approved') {
+                jobSubmissionForm.style.display = 'none';
+                approvedMessage.style.display = 'block';
+            } else if (submissionStatus === 'Rejected') {
+                // If rejected, allow resubmission.
+                rejectedMessage.style.display = 'block';
+                jobSubmissionForm.style.display = 'block';
+            } else { // Available
+                jobSubmissionForm.style.display = 'block';
+            }
+
+            // Handle proof submission form
+            const proofInputContainer = document.getElementById('proof-input-container');
+            proofInputContainer.innerHTML = '';
+            const proofType = job.submissionRequirement;
+
+            document.getElementById('job-proof-requirement').innerText = `Required Proof: ${proofType}`;
+
+            let inputHtml = '';
+            if (proofType.includes('Screenshot')) {
+                inputHtml += `<label>Screenshot/Image Link:</label><input type="text" id="proof-input" placeholder="Paste your image URL here..." required>`;
+            } else if (proofType.includes('Video')) {
+                inputHtml += `<label>Video Link (e.g., Drive link):</label><input type="text" id="proof-input" placeholder="Paste your video URL here..." required>`;
+            } else if (proofType.includes('Text')) {
+                inputHtml += `<label>Proof Text/ID:</label><textarea id="proof-input" rows="4" placeholder="Paste your proof here..." required></textarea>`;
+            }
+            proofInputContainer.innerHTML = inputHtml;
+
+            const submitForm = document.getElementById('job-submission-form');
+            submitForm.onsubmit = (e) => {
+                e.preventDefault();
+                submitJobProof(jobId, proofType, job.title);
+            };
+
+            jobDetailsPopup.style.display = 'flex';
+        }
+        
+        async function submitJobProof(jobId, proofType, jobTitle) {
+            const proofInput = document.getElementById('proof-input').value;
+            const userDoc = await db.collection('users').doc(currentUserId).get();
+            const userData = userDoc.data();
+            
+            // Check if user has already submitted for this job
+            if (userData.submissions && userData.submissions[jobId]?.status === 'Pending') {
+                 displayPopup("You have already submitted for this job and it's pending review.");
+                 return;
+            }
+
+            // Submit proof to Firestore
+            await db.collection('submissions').add({
+                jobId: jobId,
+                userId: currentUserId,
+                userName: userData.name,
+                userEmail: userData.email,
+                jobTitle: jobTitle,
+                proofType: proofType,
+                proof: proofInput,
+                status: 'Pending',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // Mark job as submitted for user with pending status
+            await db.collection('users').doc(currentUserId).update({
+                [`submissions.${jobId}`]: { status: 'Pending', submissionTime: firebase.firestore.FieldValue.serverTimestamp() }
+            });
+
+            document.getElementById('job-submission-form').reset();
+            document.getElementById('job-submission-pending-message').style.display = 'block';
+            document.getElementById('job-submission-rejected-message').style.display = 'none';
+            document.getElementById('job-submission-form').style.display = 'none';
+        }
+
+        function closeJobDetailsPopup() {
+            document.getElementById('job-details-popup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
